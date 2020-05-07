@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # WS2019_PS_SWA_5_3
 
 This is the term project for the course "Software Architecture".
@@ -14,4 +15,3 @@ http://localhost:8080/ to access the skeleton web application. You may login
 with "admin" and "passwd".
 
 
-The documentation of the project and the presentation is at issue **Documentation of the Project**.
