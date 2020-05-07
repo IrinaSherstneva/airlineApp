@@ -1,0 +1,52 @@
+<ui:composition xmlns="http://www.w3c.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:ng="http://xmlns.jcp.org/jsf/passthrough"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/main.xhtml">
+    <ui:define name ="content">
+        <form id="vacation_form">
+        	<h1> Enter Vacation </h1>
+        	<h:form>
+        	        	
+            <h:panelGrid columns="2">
+            	
+            	<p>starting date: </p>
+                <p:calendar value="#{vacationDetailController.start}"
+   					id="start" pattern="dd/MM/yyyy" mode="popup" showOn="button"
+   					readonlyInput="true"
+   					mask="99/99/?9999" placeholder="__/__/____"
+   					required="true">
+				</p:calendar>
+				
+				<p>ending date: </p>
+				<p:calendar value="#{vacationDetailController.end}"
+   					id="end" pattern="dd/MM/yyyy" mode="popup" showOn="button"
+   					readonlyInput="true"
+   					mask="99/99/?9999" placeholder="__/__/____"
+   					required="true">
+   				</p:calendar>
+   								
+				<p> </p>
+				<p:commandButton action="#{vacationDetailController.doInsertVacation}" title="Insert Vacation" update="errorMessage successMessage">
+                </p:commandButton>
+                				
+            </h:panelGrid>
+            
+            <p:dialog header="Error Message" widgetVar="errorVacationDialog" minHeight="40"  modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+    			<h:outputText id="errorMessage" value="#{vacationDetailController.errMsg}" />
+			</p:dialog> 
+			
+			<p:dialog header="Success" widgetVar="successVacationDialog" minHeight="40"  modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+    			<h:outputText id="successMessage" value="#{vacationDetailController.sucMsg}" />
+			</p:dialog>
+            
+            </h:form>
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" width="300">
+                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+            </p:confirmDialog>
+        </form>
+    </ui:define>
+</ui:composition>

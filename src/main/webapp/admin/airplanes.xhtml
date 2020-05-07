@@ -1,0 +1,137 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3c.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/main.xhtml">
+    <ui:define name ="content">
+    <h:body>
+        <h:form id="airplaneForm">
+            <p:dataTable id="airplanesTable" var="airplane" value="#{airplaneListController.airplanes}">
+                <p:column headerText="Airplane ID">
+                    <h:outputText value="#{airplane.airplaneId}"/>
+                </p:column>
+                <p:column headerText="Location">
+                    <h:outputText value="#{airplane.locationCode}"/>
+                </p:column>
+                <p:column headerText="Assigned To Flight">
+                    <h:outputText value="#{airplane.isAssignedToFlight}"/>
+                </p:column>
+                <p:column headerText="Number of seats">
+                    <h:outputText value="#{airplane.numSeats}" />
+                </p:column>
+                <p:column headerText="Last Flight Ended">
+                   <h:outputText value="#{airplane.timeLastFlightEnded}" />
+                </p:column>
+                <p:column headerText="Airplane Type">
+                   <h:outputText value="#{airplane.airplaneType}" />
+                </p:column>
+           		<p:column style="width:150px;text-align: center">
+                    <p:commandButton update=":airplaneEditDialog" oncomplete="PF('airplaneEditDialog').show()" icon="ui-icon-note" title="Edit">
+                        <f:setPropertyActionListener value="#{airplane}" target="#{airplaneDetailController.airplane}" />
+                    </p:commandButton>
+                    <p:commandButton action="#{airplaneDetailController.doDeleteAirplane}" icon="ui-icon-trash" title="Delete" update=":airplaneForm:airplanesTable">
+                        <f:setPropertyActionListener value="#{airplane}" target="#{airplaneDetailController.airplane}" />
+                        <p:confirm header="Confirmation" message="Are you sure that you want to delete this airplane? You cannot undo this operation." icon="ui-icon-alert" />
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+           	<p:commandButton  oncomplete="PF('airplaneCreateDialog').show()" title="New Airplane" action="#{newAirplaneController.initAirplane}" update=":airplaneCreateDialog" style="margin-top:20px;" styleClass="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only">
+               
+            </p:commandButton>
+            
+         </h:form>
+            
+			<p:dialog header="Edit Airplane" id="airplaneEditDialog" widgetVar="airplaneEditDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+                <h:form>
+                <p:outputPanel id="airplaneData" rendered="#{not empty airplaneDetailController.airplane}">
+                     <h:panelGrid columns="2">
+                        <p:outputLabel for="iataCode" value="Airport Code: " />
+                        <p:selectOneMenu id="iataCode" required="true" value="#{airplaneDetailController.airplane.locationCode}" style="width:150px">
+                			<f:selectItem itemLabel="-- select --" />
+                			<f:selectItems value="#{newAirplaneController.iataCodes}" />
+                		</p:selectOneMenu>
+                        <p:outputLabel for="timeLastFlightEnded" value="Last Flight Ended on: " />
+                        <p:calendar id="timeLastFlightEnded" value="#{airplaneDetailController.airplane.timeLastFlightEnded}"
+							required="true" pattern="yyyy-MM-dd HH:mm" showOn="button" timeZone="GMT+1">
+						</p:calendar>
+                        <p:outputLabel for="isAssignedToFlight" value="Assigned To Flight: " />
+                        <p:inputText id="isAssignedToFlight" disabled="true" value="#{airplaneDetailController.airplane.isAssignedToFlight}"/>
+                        <p:outputLabel for="numSeats" value="Number of Seats: " />
+                        <p:inputText id="numSeats" required="true" value="#{airplaneDetailController.airplane.numSeats}"/>    
+                        <p:outputLabel for="numPilotsNecessary" value="Number of Pilots Necessary: " />
+                        <p:inputText id="numPilotsNecessary" required="true" value="#{airplaneDetailController.airplane.numPilotsNecessary}"/>
+                        <p:outputLabel for="numCabinCrewNecessary" value="Number of Cabin Crew Necessary: " />
+                        <p:inputText id="numCabinCrewNecessary" required="true" value="#{airplaneDetailController.airplane.numCabinCrewNecessary}"/>
+                        <p:outputLabel for="airplaneType" value="Airplane Type: " />
+                        <p:selectOneMenu id="airplaneType" required="true" value="#{airplaneDetailController.airplane.airplaneType}" style="width:150px">
+                			<f:selectItem itemLabel="-- select --"  />
+                			<f:selectItems value="#{newAirplaneController.airplaneTypes}" />
+                		</p:selectOneMenu>
+                        
+                    </h:panelGrid>
+                    <p:separator />
+                    <h:panelGrid columns="3">
+                        <p:commandButton value="Save" action="#{airplaneDetailController.doSaveAirplane()}" oncomplete="PF('airplaneEditDialog').hide()" update=":airplaneForm:airplanesTable"/>
+                        <p:commandButton value="Reload" action="#{airplaneDetailController.doReloadAirplane()}" update="airplaneData"/>
+                        <p:commandButton value="Abort" onclick="PF('airplaneEditDialog').hide()"/>
+                    </h:panelGrid>
+                </p:outputPanel>
+               </h:form>
+            </p:dialog>
+			<p:dialog header="Create New Airplane" id="airplaneCreateDialog" widgetVar="airplaneCreateDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+                <h:form>
+                <p:outputPanel id="newAirplaneData" >
+                     <h:panelGrid columns="2">
+                     	<p:outputLabel for="newAirplaneId" value="Airplane Id: " />
+                        <p:inputText id="newAirplaneId" required="true" value="#{newAirplaneController.airplane.airplaneId}"/>
+                        
+                   		<p:outputLabel for="newTimeLastFlightEnded" value="Last Flight Ended on: " />
+                        <p:calendar id="newTimeLastFlightEnded" value="#{newAirplaneController.airplane.timeLastFlightEnded}" 
+							required="true" pattern="yyyy-MM-dd HH:mm" showOn="button" timeZone="GMT+1">
+						</p:calendar>
+                        <p:outputLabel for="newIsAssignedToFlight" value="Assigned To Flight: " />
+                        <p:inputText id="newIsAssignedToFlight" disabled="true" value="#{newAirplaneController.airplane.isAssignedToFlight}"/>
+                        <p:outputLabel for="newNumSeats" value="Number of Seats: " />
+                        <p:inputText id="newNumSeats" required="true" value="#{newAirplaneController.airplane.numSeats}"/>    
+                        <p:outputLabel for="newNumPilotsNecessary" value="Number of Pilots Necessary: " />
+                        <p:inputText id="newNumPilotsNecessary" required="true" value="#{newAirplaneController.airplane.numPilotsNecessary}"/>
+                        <p:outputLabel for="newNumCabinCrewNecessary" value="Number of Cabin Crew Necessary: " />
+                        <p:inputText id="newNumCabinCrewNecessary" required="true" value="#{newAirplaneController.airplane.numCabinCrewNecessary}"/>
+                        <p:outputLabel for="newAirplaneType" value="Airplane Type: " />
+                        <p:selectOneMenu id="newAirplaneType" required="true" value="#{newAirplaneController.airplane.airplaneType}" style="width:150px">
+                			<f:selectItem itemLabel="-- select --"  />
+                			<f:selectItems value="#{newAirplaneController.airplaneTypes}" />
+                		</p:selectOneMenu>
+                        <p:outputLabel for="newIataCode" value="Airport Code: " />
+                        <p:selectOneMenu id="newIataCode" required="true" value="#{newAirplaneController.airplane.locationCode}" style="width:150px">
+                			<f:selectItem itemLabel="-- select --" />
+                			<f:selectItems value="#{newAirplaneController.iataCodes}" />
+                		</p:selectOneMenu>
+                      </h:panelGrid>
+                    <p:separator />
+                    <h:panelGrid columns="1">
+                        <p:commandButton value="Save" action="#{newAirplaneController.doSaveAirplane()}" oncomplete="PF('airplaneCreateDialog').hide()" update=":airplaneForm:airplanesTable"/>
+                    </h:panelGrid>
+                </p:outputPanel>
+                </h:form>
+            </p:dialog>
+            
+            
+        
+        <p:dialog dynamic="true" id="pilotDeletedDialog" widgetVar="pilotDeletedDialog" modal="true" minHeight="40">
+			<h:form id="msg">
+    			<h:outputText id="pilotDeletedMsg" value="#{airplaneDetailController.pilotDeletedMsg}" />
+    		</h:form>
+			</p:dialog>
+		<p:confirmDialog global="true" showEffect="fade" hideEffect="fade" width="300">
+		<h:form>
+                <p:commandButton value="Yes" oncomplete="PF('pilotDeletedDialog').show()" update=":pilotDeletedDialog" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+           </h:form>
+            </p:confirmDialog>
+          </h:body>
+    </ui:define>
+</ui:composition>

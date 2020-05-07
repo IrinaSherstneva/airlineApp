@@ -1,0 +1,146 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3c.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/main.xhtml">
+    <ui:define name ="content">
+        <h:form id="userForm">
+            <p:dataTable id="usersTable" var="user" value="#{userListController.users}">
+                <p:column headerText="Username">
+                    <h:outputText value="#{user.username}"/>
+                </p:column>
+                <p:column headerText="First Name">
+                    <h:outputText value="#{user.firstName}"/>
+                </p:column>
+                <p:column headerText="Last Name">
+                    <h:outputText value="#{user.lastName}"/>
+                </p:column>
+                <p:column headerText="Roles">
+                    <h:outputText value="#{user.roles}" />
+                </p:column>
+                <p:column headerText="Airport">
+                    <h:outputText value="#{user.locationCode}"/>
+                </p:column>
+                <p:column style="width:100px;text-align: center">
+                    <p:commandButton update=":userForm:userEditDialog" oncomplete="PF('userEditDialog').show()" icon="ui-icon-note" title="Edit">
+                        <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}" />
+                    </p:commandButton>
+                    <p:commandButton action="#{userDetailController.doDeleteUser}" icon="ui-icon-trash" title="Delete" update=":userForm:usersTable">
+                        <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}" />
+                        <p:confirm header="Confirmation" message="Are you sure that you want to delete this user? You cannot undo this operation." icon="ui-icon-alert" />
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+            
+			<p:commandButton   action="#{newUserController.initUser}" update="userCreateDialog" oncomplete="PF('userCreateDialog').show()" title="New User" style="margin-top:20px;" styleClass="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only">  
+            </p:commandButton>
+            
+            <p:dialog header="Edit User" id="userEditDialog" widgetVar="userEditDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+                <p:outputPanel id="userData" rendered="#{not empty userDetailController.user}">
+                    <h:panelGrid columns="2">
+                        <p:outputLabel for="username" value="Username: " />
+                        <p:inputText id="username" value="#{userDetailController.user.username}" disabled="true"/>
+                        <p:outputLabel for="password" value="Password: " />
+                        <p:password id="password" value="#{userDetailController.user.password}" disabled="true"/>
+                    </h:panelGrid>
+                    <p:separator />
+                    <h:panelGrid columns="2">
+                        <p:outputLabel for="firstName" value="First Name: " />
+                        <p:inputText id="firstName" value="#{userDetailController.user.firstName}"/>
+                        <p:outputLabel for="firstName" value="Last Name: " />
+                        <p:inputText id="lastName" value="#{userDetailController.user.lastName}"/>
+                        <p:outputLabel for="email" value="E-Mail: " />
+                        <p:inputText id="email" value="#{userDetailController.user.email}"/>
+                        <p:outputLabel for="phone" value="Phone: " />
+                        <p:inputMask id="phone" value="#{userDetailController.user.phone}" mask="+99? 999 9999999"/>
+                    </h:panelGrid>
+                    <p:separator />
+                    <h:panelGrid columns="2">
+                    	<p:outputLabel for="roles" value="Role: " />
+                        	<p:selectOneRadio id="roles" value="#{userDetailController.role}">
+        					<f:selectItem itemLabel="admin" itemValue="admin" />
+        					<f:selectItem itemLabel="manager" itemValue="manager" />
+        					<f:selectItem itemLabel="pilot" itemValue="pilot" />
+        					<f:selectItem itemLabel="crew" itemValue="crew" />
+    					</p:selectOneRadio>
+    				</h:panelGrid>
+    				<p:separator />
+                    <h:panelGrid columns="2">
+                        <p:outputLabel for="enabled" value="Enabled: " />
+                        <p:selectBooleanCheckbox id="enabled" value="#{userDetailController.user.enabled}"/>
+                    </h:panelGrid>
+                    <p:separator />
+                    <h:panelGrid columns="3">
+                        <p:commandButton value="Save" action="#{userDetailController.doSaveUser()}" update=":userForm:usersTable"/>
+                        <p:commandButton value="Reload" action="#{userDetailController.doReloadUser()}" update=":userForm:userData"/>
+                        <p:commandButton value="Abort" onclick="PF('userEditDialog').hide()"/>
+                    </h:panelGrid>
+                </p:outputPanel>
+                <p:dialog header="Error Message" widgetVar="errorEditDialog" minHeight="40">
+    					<h:outputText value="Each field must be completed! Please check." />
+				</p:dialog>
+            </p:dialog>
+			<p:dialog header="Create New User" id="userCreateDialog" widgetVar="userCreateDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+                <p:outputPanel id="newUserData" >
+                	<p:messages for="msgCreate" />
+                     <h:panelGrid columns="2">
+                     	<p:outputLabel for="newUserName" value="Username: " />
+                        <p:inputText id="newUserName" value="#{newUserController.user.username}"/>
+                        <p:outputLabel for="newPassword" value="Password: " />
+                        <p:inputText id="newPassword" value="#{newUserController.user.password}"/>
+                        <p:separator />
+                        <p:separator />
+                        <p:outputLabel for="newSurname" value="Surname: " />
+                        <p:inputText id="newSurname" value="#{newUserController.user.lastName}"/>
+                        <p:outputLabel for="newFirstname" value="Firstname: " />
+                        <p:inputText id="newFirstname" value="#{newUserController.user.firstName}"/>
+                        <p:outputLabel for="newMailaddress" value="Email: " />
+                        <p:inputText id="newMailaddress" value="#{newUserController.user.email}"/>  
+                        <p:outputLabel for="newPhonenumber" value="Phone: " />
+                        <p:inputText id="newPhonenumber" value="#{newUserController.user.phone}" mask="+99? 999 9999999"/> 
+                        <p:outputLabel for="iataCode" value="Airport Code: " />
+                        <p:selectOneMenu id="iataCode" value="#{iataDropdownController.iataCode}" style="width:150px">
+                			<f:selectItems value="#{iataDropdownController.iataCodes}" />
+            			</p:selectOneMenu>
+                        <p:separator />
+                        <p:separator />
+                        <p:outputLabel for="newRoles" value="Role: " />
+                        <p:selectOneRadio id="newRoles" value="#{newUserController.role}">
+        					<f:selectItem itemLabel="admin" itemValue="admin" />
+        					<f:selectItem itemLabel="manager" itemValue="manager" />
+        					<f:selectItem itemLabel="pilot" itemValue="pilot" />
+        					<f:selectItem itemLabel="crew" itemValue="crew" />
+    					</p:selectOneRadio>
+                      </h:panelGrid>
+                    <p:separator />
+                    <h:panelGrid columns="1">
+                        <p:commandButton value="Save" action="#{newUserController.doSaveUser()}" update=":userForm:usersTable">
+                        	
+                        </p:commandButton>
+                    </h:panelGrid>
+                </p:outputPanel>    
+                <p:dialog header="Error Message" widgetVar="errorCreate" minHeight="40">
+    					<h:outputText value="Each field must be completed! Please check." />
+				</p:dialog>  
+				<p:dialog header="Error Message" widgetVar="errorUniqueUsernameDialog" minHeight="40">
+    					<h:outputText value="Please choose an unique username." />
+				</p:dialog>                   
+            </p:dialog> 
+			<p:dialog header="Delete Error Message" widgetVar="errorDeleteDialog" minHeight="40">
+    			<h:outputText value="User was assigned to flight. No other user was found to replace him/her. Please check at Error Page." />
+			</p:dialog>
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" width="300">
+                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+            </p:confirmDialog>
+
+        </h:form>
+        
+        
+   
+            
+    </ui:define>
+</ui:composition>

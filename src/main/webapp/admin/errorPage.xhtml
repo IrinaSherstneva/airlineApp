@@ -1,0 +1,111 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3c.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/main.xhtml">
+    <ui:define name ="content">
+        <h:form id="flightErrorForm">
+            <p:dataTable id="flightErrorTable" var="flight" value="#{flightErrorListController.errorFlights}">
+                <p:column headerText="Flight Number">
+                    <h:outputText value="#{flight.flightNumber}"/>
+                </p:column>
+                <p:column headerText="Departure Airport">
+                    <h:outputText value="#{flight.codeAirportDeparture}"/>
+                </p:column>
+                <p:column headerText="Arrival Airport">
+                    <h:outputText value="#{flight.codeAirportArrival}"/>
+                </p:column>
+                <p:column headerText="Airplane">
+                    <h:outputText value="#{flight.airplane}" />
+                </p:column>
+                <p:column headerText="is Employee missing">
+                    <h:outputText value="#{flight.missingEmployee}" />
+                </p:column>
+                <p:column style="width:150px;text-align: center">
+                	<p:commandButton icon="ui-icon-caret-1-n" title="Add Airplane"
+							action="#{flightDetailController.findAvailableAirplane()}"
+							update=":selectNewAirplaneDialog :btn:saveFbutton">
+					<f:setPropertyActionListener value="#{flight}" target="#{flightDetailController.flight}"/>
+					</p:commandButton>
+                    <p:commandButton update=":flightErrorForm:flightErrorTable :flightErrorForm:flightEditDialog"  icon="ui-icon-person" title="Add Employee" process="@this" action="#{userErrorController.findAvailableEmployees}">
+                    	<f:setPropertyActionListener value="#{flight}" target="#{userErrorController.flight}" />
+                    </p:commandButton>
+                </p:column>
+                                
+            </p:dataTable>
+            
+            <p:dialog header="Edit Flight" id="flightEditDialog" widgetVar="flightEditDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+                <p:outputPanel id="flightData" rendered="#{not empty userErrorController.flight}">
+                    <h:panelGrid columns="2">
+                        <p:outputLabel for="flightId" value="Flight Id: " />
+                        <p:inputText id="flightId" value="#{userErrorController.flight.flightNumber}" disabled="true"/>
+                    </h:panelGrid>
+                    <h:panelGrid columns="1">
+						<p:outputLabel for="assignedEmployee" value="Assign Employee: " />
+						<p:selectOneMenu id="assignedEmployee" dynamic="true" value="#{userErrorController.selectedEmployee}" style="width:150px" >
+							<f:selectItem itemLabel="-- select --" />
+							<f:selectItems value="#{userErrorController.availableEmployees}" />
+						</p:selectOneMenu>
+					</h:panelGrid>
+					<p:commandButton action="#{userErrorController.doSaveFlight}" update=":flightErrorForm:flightErrorTable" oncomplete="PF('flightEditDialog').hide()" title="Add Employee">
+                    </p:commandButton>
+                </p:outputPanel>
+                
+				 
+            </p:dialog>
+            <p:dialog header="Error Message" widgetVar="errorNoEmployeeDialog" minHeight="40">
+    				<h:outputText value="No employee was found." />
+				</p:dialog> 
+            <p:dialog header="Missing Airplane Error" widgetVar="missingAirplaneErrorDialog" minHeight="40">
+    				<h:outputText value="Flight needs an airplane, before assigning employees." />
+				</p:dialog>
+            <p:dialog header="Success Message" widgetVar="successEmployeeInsertDialog" minHeight="40">
+    			<h:outputText value="Employee was inserted successfully. Flight has no missing employee." />
+			</p:dialog> 
+			<p:dialog header="Missing Value Message" widgetVar="missingEmployeeDialog" minHeight="40">
+    			<h:outputText value="Adding of employee was successfully, but there are more employees missing." />
+			</p:dialog>
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" width="300">
+                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+            </p:confirmDialog>
+
+        </h:form>
+     <p:dialog header="Assign Airplane to the flight"
+			id="selectNewAirplaneDialog" widgetVar="selectNewAirplaneDialog"
+			 showEffect="fade" hideEffect="fade" resizable="false">
+			<h:form id="btn">	
+				<p:outputPanel id="newAirplaneData">
+					<h:panelGrid columns="1">
+						<p:outputLabel for="newAssignedAirplane"
+							value="Available Airplanes: " />
+						<p:selectOneMenu id="newAssignedAirplane" dynamic="true"
+							value="#{flightDetailController.selectedAirplaneId}"
+							style="width:150px" >
+							<f:selectItem itemLabel="-- select --" />
+							<f:selectItems value="#{flightDetailController.availablePlanes}" />
+						</p:selectOneMenu>
+					</h:panelGrid>
+					<p:separator />
+					<h:panelGrid columns="2">
+						<p:commandButton value="Select"
+							action="#{flightDetailController.doAssignAirplane()}"
+							update="saveFbutton"/>
+							
+						<p:commandButton value="Save" id="saveFbutton"
+							action="#{flightDetailController.doSaveFlight()}"
+							oncomplete="PF('selectNewAirplaneDialog').hide()"
+							update=":flightErrorForm:flightErrorTable" disabled="#{flightDetailController.airplaneNotSelected}"
+							ajax="false"/>
+					</h:panelGrid>
+				</p:outputPanel>
+			</h:form>
+		</p:dialog>   
+        
+   
+            
+    </ui:define>
+</ui:composition>
