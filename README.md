@@ -1,7 +1,6 @@
-<<<<<<< HEAD
-# WS2019_PS_SWA_5_3
 
-This is the term project for the course "Software Architecture".
+
+This is the term project for the course "Software Architecture". Authors: Irina Sherstneva and Julia Pelz.
 
 It utilizes Spring Boot and is configured as maven web application project with:
  - all relevant Spring Framework features enabled
